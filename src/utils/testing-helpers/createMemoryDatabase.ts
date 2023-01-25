@@ -56,11 +56,12 @@ export async function createMemoryDatabase(
     const collections = await mongo.connection.db.listCollections().toArray();
 
     for (const collection of collections) {
-      await this.connection.db.dropCollection(collection.name);
+      await mongo.connection.db.dropCollection(collection.name);
     }
   };
 
   const closeDatabase = async () => {
+    await clearCollections();
     await mongo.connection.dropDatabase();
     await mongo.disconnect();
     await mongod.stop();

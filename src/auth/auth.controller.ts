@@ -12,16 +12,31 @@ import type { Request, Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserDto } from '../users/dtos/user.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  private refreshMaxAge = 86400000;
+  refreshMaxAge = 86400000;
 
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
   ) {}
 
+  @ApiResponse({
+    status: 200,
+    description: 'The user has successfully logged into their account',
+    content: {
+      response: {
+        example: {
+          accessToken: 'my-secret-token',
+          user: new UserDto({ id: 1, username: 'terminaate' }),
+        },
+      },
+    },
+  })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -37,6 +52,30 @@ export class AuthController {
     res.json(response);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'The user has successfully logged into their account',
+    content: {
+      response: {
+        example: {
+          accessToken: 'my-secret-token',
+          user: new UserDto({ id: 1, username: 'terminaate' }),
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has successfully register a new account',
+    content: {
+      response: {
+        example: {
+          accessToken: 'my-secret-token',
+          user: new UserDto({ id: 1, username: 'terminaate' }),
+        },
+      },
+    },
+  })
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(
@@ -52,6 +91,17 @@ export class AuthController {
     res.json(response);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'The user has successfully refresh his auth tokens',
+    content: {
+      response: {
+        example: {
+          accessToken: 'my-secret-token',
+        },
+      },
+    },
+  })
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
@@ -69,6 +119,19 @@ export class AuthController {
     res.json({ accessToken: newAccessToken });
   }
 
+  @ApiResponse({
+    status: 200,
+    description:
+      'The user has successfully logout from his account (removing http only cookies)',
+    content: {
+      response: {
+        example: {
+          accessToken: 'my-secret-token',
+          user: new UserDto({ id: 1, username: 'terminaate' }),
+        },
+      },
+    },
+  })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {

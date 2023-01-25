@@ -5,7 +5,7 @@ import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { UserToken, UserTokenModel } from './models/users-tokens.model';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -31,18 +31,12 @@ export class UsersService {
       },
     );
     if (save) {
-      const userToken = await this.usersTokensModel.findOne({
+      // TODO
+      // add maximum count of sessions
+      await this.usersTokensModel.create({
         userId,
+        refreshToken,
       });
-      if (!userToken) {
-        await this.usersTokensModel.create({
-          userId,
-          refreshToken,
-        });
-      } else {
-        userToken.refreshToken = refreshToken;
-        await userToken.save();
-      }
     }
     return { accessToken, refreshToken };
   }
@@ -83,9 +77,9 @@ export class UsersService {
     const { id } = (await this.jwtService.decode(token, {
       json: true,
     })!) as Record<string, string>;
-    if (!(await this.usersModel.findById(id))) {
+    if (!Types.ObjectId.isValid(id) || !(await this.usersModel.findById(id))) {
       throw new ForbiddenException();
     }
-    return true;
+    return this.usersTokensModel.findOne({ refreshToken: token });
   }
 }
