@@ -17,19 +17,6 @@ export class MemoryDatabase {
     this.initModels(models);
   }
 
-  private async init() {
-    this.mongod = await MongoMemoryServer.create();
-    this.uri = this.mongod.getUri();
-    this.mongo = await connect(this.uri);
-    await this.mongo.connection.db.dropDatabase();
-  }
-
-  private initModels(models: Model[]) {
-    for (const model of models) {
-      this.models[model.name] = this.mongo.model(model.name, model.schema);
-    }
-  }
-
   public async clearCollections() {
     const collections = await this.mongo.connection.db
       .listCollections()
@@ -45,5 +32,18 @@ export class MemoryDatabase {
     await this.mongo.connection.dropDatabase();
     await this.mongo.disconnect();
     await this.mongod.stop();
+  }
+
+  private async init() {
+    this.mongod = await MongoMemoryServer.create();
+    this.uri = this.mongod.getUri();
+    this.mongo = await connect(this.uri);
+    await this.mongo.connection.db.dropDatabase();
+  }
+
+  private initModels(models: Model[]) {
+    for (const model of models) {
+      this.models[model.name] = this.mongo.model(model.name, model.schema);
+    }
   }
 }

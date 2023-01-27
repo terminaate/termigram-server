@@ -10,14 +10,6 @@ import { RegisterDto } from './dtos/register.dto';
 export class AuthService {
   constructor(private usersService: UsersService) {}
 
-  private createResponseDto(user, accessToken, refreshToken) {
-    const response = {
-      accessToken,
-      user: new UserDto(user),
-    };
-    return { response, refreshToken };
-  }
-
   async login({ login, password }: LoginDto) {
     const candidate = await this.usersService.findUserByQuery({ login });
     if (!candidate) {
@@ -49,5 +41,13 @@ export class AuthService {
     await this.usersService.validateRefreshToken(refreshToken);
     const userTokens = await this.usersService.findUserToken({ refreshToken });
     return this.usersService.generateUserTokens(userTokens.userId, true);
+  }
+
+  private createResponseDto(user, accessToken, refreshToken) {
+    const response = {
+      accessToken,
+      user: new UserDto(user),
+    };
+    return { response, refreshToken };
   }
 }

@@ -8,7 +8,7 @@ export const createAuthModuleRef = async (memDb: MemoryDatabase) => {
   const usersModule = await createUserModuleRef(memDb);
   const usersService = usersModule.get<UsersService>(UsersService);
 
-  const authModuleRef = await Test.createTestingModule({
+  return Test.createTestingModule({
     providers: [
       AuthService,
       {
@@ -17,6 +17,4 @@ export const createAuthModuleRef = async (memDb: MemoryDatabase) => {
       },
     ],
   }).compile();
-
-  return authModuleRef;
 };

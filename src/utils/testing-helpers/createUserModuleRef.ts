@@ -7,7 +7,7 @@ import { UserToken } from '../../users/models/users-tokens.model';
 import { MemoryDatabase } from './MemoryDatabase';
 
 export const createUserModuleRef = async (memDb: MemoryDatabase) => {
-  const usersModuleRef = await Test.createTestingModule({
+  return Test.createTestingModule({
     imports: [
       JwtModule.register({
         secretOrPrivateKey: '12o3hjasdjzxcjas2',
@@ -26,5 +26,4 @@ export const createUserModuleRef = async (memDb: MemoryDatabase) => {
     ],
     exports: [UsersService],
   }).compile();
-  return usersModuleRef;
 };
