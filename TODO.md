@@ -8,6 +8,7 @@
 
 🟥 - Currently not possible to implement
 
+- Add husky to a project (⬜)
 - Basic authorization with access and refresh tokens (✅)
 - Do a basic CRUD service for user data (🟨)
 - Uploading a static files to a server (🟨)
