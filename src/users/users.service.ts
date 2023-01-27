@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { User, UserModel } from './models/users.model';
+import { User, UserDocument, UserModel } from './models/users.model';
 import { CreateUserDto } from './dtos/create-user.dto';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
@@ -7,6 +7,8 @@ import { UserToken, UserTokenModel } from './models/users-tokens.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Types } from 'mongoose';
 import { UsersExceptions } from './users.exceptions';
+import { PatchUserDto } from './dtos/patch-user.dto';
+import { UserDto } from './dtos/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +27,16 @@ export class UsersService {
       throw UsersExceptions.UserIsNotExist();
     }
     return user;
+  }
+
+  async patchUser(user: UserDocument, patchUserDto: PatchUserDto) {
+    for (const key in patchUserDto) {
+      if (user.get(key)) {
+        user.set(key, patchUserDto[key]);
+      }
+    }
+    await user.save();
+    return new UserDto(user);
   }
 
   async generateUserTokens(userId: string, save = false) {

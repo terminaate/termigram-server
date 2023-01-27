@@ -23,6 +23,15 @@ export class User {
   @Prop({ type: DataTypes.STRING, required: false })
   username: string;
 
+  // @ApiProperty({
+  //   example: '/static/my-user-id/avatar',
+  //   description: 'The avatar of user profile',
+  //   required: false,
+  //   type: String,
+  // })
+  // @Prop({ type: DataTypes.STRING, required: false })
+  // avatar: string;
+
   @ApiProperty({
     example: '12345678',
     description: 'The password of user account',
