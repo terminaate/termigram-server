@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserToken, UserTokenModel } from './models/users-tokens.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Types } from 'mongoose';
+import { UsersExceptions } from './users.exceptions';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,17 @@ export class UsersService {
     @InjectModel(UserToken.name) private usersTokensModel: UserTokenModel,
     private readonly jwtService: JwtService,
   ) {}
+
+  async getUserById(userId: string) {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw UsersExceptions.UserIdIsNotValid();
+    }
+    const user = await this.usersModel.findById(userId);
+    if (!user) {
+      throw UsersExceptions.UserIsNotExist();
+    }
+    return user;
+  }
 
   async generateUserTokens(userId: string, save = false) {
     const accessToken = this.jwtService.sign(

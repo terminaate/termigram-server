@@ -1,22 +1,21 @@
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { createMemoryDatabase } from '../utils/testing-helpers/createMemoryDatabase';
+import { MemoryDatabase } from '../utils/testing-helpers/MemoryDatabase';
 import { User, UserSchema } from '../users/models/users.model';
 import { UserToken, UserTokenSchema } from '../users/models/users-tokens.model';
-import { Test } from '@nestjs/testing';
-import { JwtModule } from '@nestjs/jwt';
-import { getModelToken } from '@nestjs/mongoose';
 import { AuthController } from './auth.controller';
 import { mockResponse } from '../utils/testing-helpers/mockResponse';
+import { createUserModuleRef } from '../utils/testing-helpers/createUserModuleRef';
+import { createAuthModuleRef } from '../utils/testing-helpers/createAuthModuleRef';
 
 describe('AuthController', () => {
   let service: AuthService;
   let controller: AuthController;
   let usersService: UsersService;
-  let memDb: Awaited<ReturnType<typeof createMemoryDatabase>>;
+  let memDb: MemoryDatabase;
 
   beforeAll(async () => {
-    memDb = await createMemoryDatabase([
+    memDb = new MemoryDatabase([
       {
         name: User.name,
         schema: UserSchema,
@@ -26,40 +25,11 @@ describe('AuthController', () => {
         schema: UserTokenSchema,
       },
     ]);
-    const usersModule = await Test.createTestingModule({
-      imports: [
-        JwtModule.register({
-          secretOrPrivateKey: 'asda123',
-        }),
-      ],
-      providers: [
-        UsersService,
-        {
-          provide: getModelToken(User.name),
-          useValue: memDb.models[User.name],
-        },
-        {
-          provide: getModelToken(UserToken.name),
-          useValue: memDb.models[UserToken.name],
-        },
-      ],
-      exports: [UsersService],
-    }).compile();
-    usersService = usersModule.get<UsersService>(UsersService);
-
-    const moduleRef = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        {
-          provide: UsersService,
-          useValue: usersService,
-        },
-      ],
-      controllers: [AuthController],
-    }).compile();
-
-    service = moduleRef.get<AuthService>(AuthService);
-    controller = moduleRef.get<AuthController>(AuthController);
+    const usersModuleRef = await createUserModuleRef(memDb);
+    usersService = usersModuleRef.get<UsersService>(UsersService);
+    const authModuleRef = await createAuthModuleRef(memDb);
+    service = authModuleRef.get<AuthService>(AuthService);
+    controller = authModuleRef.get<AuthController>(AuthController);
   });
   afterAll(() => {
     memDb.closeDatabase();
