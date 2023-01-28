@@ -8,7 +8,7 @@
 
 🟥 - Currently not possible to implement
 
-- Add husky to project (🟨)
+- Add husky to project (🟨/✅)
 - Migrate to fastify (🟨)
 - Basic authorization with access and refresh tokens (✅)
 - Do a basic CRUD service for user data (🟨)

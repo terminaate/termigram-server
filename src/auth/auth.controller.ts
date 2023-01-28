@@ -8,12 +8,12 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type { Request, Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDto } from '../users/dtos/user.dto';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -41,15 +41,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() authDto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const { response, refreshToken } = await this.authService.login(authDto);
-    res.cookie('refreshToken', refreshToken, {
+    res.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: this.refreshMaxAge,
-      secure: true,
     });
-    res.json(response);
+    res.send(response);
   }
 
   @ApiResponse({
@@ -80,15 +79,14 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(
     @Body() authDto: RegisterDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const { response, refreshToken } = await this.authService.register(authDto);
-    res.cookie('refreshToken', refreshToken, {
+    res.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: this.refreshMaxAge,
-      secure: true,
     });
-    res.json(response);
+    res.send(response);
   }
 
   @ApiResponse({
@@ -105,18 +103,17 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const { refreshToken } = req.cookies;
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       await this.authService.refresh(refreshToken);
-    res.cookie('refreshToken', newRefreshToken, {
+    res.setCookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       maxAge: this.refreshMaxAge,
-      secure: true,
     });
-    res.json({ accessToken: newAccessToken });
+    res.send({ accessToken: newAccessToken });
   }
 
   @ApiResponse({
@@ -134,14 +131,13 @@ export class AuthController {
   })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
+  ) {
     const { refreshToken } = req.cookies;
     await this.authService.validateRefreshToken(refreshToken);
-    res.clearCookie('refreshToken', {
-      httpOnly: true,
-      maxAge: this.refreshMaxAge,
-      secure: true,
-    });
-    res.json({ status: 200 });
+    res.unsignCookie('refreshToken');
+    res.send({ status: 200 });
   }
 }
