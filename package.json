@@ -13,12 +13,11 @@
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
-    "lint": "eslint \"src/**/*\" --fix && cd client && npm run lint",
+    "lint": "eslint \"src/**/*\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.1",
@@ -41,8 +40,6 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.8.0",
-    "sequelize": "^6.28.0",
-    "sequelize-typescript": "^2.1.5",
     "sqlite3": "^5.1.4"
   },
   "devDependencies": {
@@ -55,7 +52,6 @@
     "@types/jest": "29.2.5",
     "@types/node": "^18.11.18",
     "@types/passport-jwt": "^3.0.8",
-    "@types/sequelize": "^4.28.14",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",

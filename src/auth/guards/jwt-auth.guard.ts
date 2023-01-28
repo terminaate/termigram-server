@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { User } from '../../users/models/users.model';
+import { UserDocument } from '../../users/models/users.model';
 
-export type UserRequest = Request & { user: User };
+export type UserRequest = Request & { user: UserDocument };
 
 @Injectable()
-class JwtAuthGuard extends AuthGuard('jwt') {}
-
-export default JwtAuthGuard;
+export class JwtAuthGuard extends AuthGuard('jwt') {}
