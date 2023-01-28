@@ -8,12 +8,12 @@
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build": "nest build",
-    "format": "prettier --write \"src/**/*\" \"test/**/*\"",
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
     "lint": "eslint \"src/**/*\" --fix",
+    "format": "prettier --write \"src/**/*\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
