@@ -7,14 +7,20 @@ type Model = {
 };
 
 export class MemoryDatabase {
-  mongod: MongoMemoryServer;
-  uri: string;
-  mongo: Awaited<ReturnType<typeof connect>>;
   models: Record<string, unknown> = {};
 
-  constructor(models: Model[]) {
-    void this.init();
-    this.initModels(models);
+  constructor(
+    models: Model[],
+    public mongod: MongoMemoryServer,
+    public mongo: Awaited<ReturnType<typeof connect>>,
+  ) {}
+
+  static async create(models: Model[]) {
+    const mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
+    const mongo = await connect(uri);
+    await mongo.connection.db.dropDatabase();
+    return new MemoryDatabase(models, mongod, mongo);
   }
 
   public async clearCollections() {
@@ -32,13 +38,6 @@ export class MemoryDatabase {
     await this.mongo.connection.dropDatabase();
     await this.mongo.disconnect();
     await this.mongod.stop();
-  }
-
-  private async init() {
-    this.mongod = await MongoMemoryServer.create();
-    this.uri = this.mongod.getUri();
-    this.mongo = await connect(this.uri);
-    await this.mongo.connection.db.dropDatabase();
   }
 
   private initModels(models: Model[]) {
