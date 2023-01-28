@@ -3,6 +3,8 @@ import { AuthService } from '../../auth/auth.service';
 import { UsersService } from '../../users/users.service';
 import { MemoryDatabase } from './MemoryDatabase';
 import { createUserModuleRef } from './createUserModuleRef';
+import { AuthController } from '../../auth/auth.controller';
+import { forwardRef } from '@nestjs/common';
 
 export const createAuthModuleRef = async (memDb: MemoryDatabase) => {
   const usersModule = await createUserModuleRef(memDb);
@@ -16,5 +18,6 @@ export const createAuthModuleRef = async (memDb: MemoryDatabase) => {
         useValue: usersService,
       },
     ],
+    controllers: [AuthController],
   }).compile();
 };

@@ -1,17 +1,22 @@
-import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { AuthExceptions } from './auth.exceptions';
 import * as argon2 from 'argon2';
 import { UserDto } from '../users/dtos/user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
+import { UsersRepository } from '../users/users.repository';
+import { Types } from 'mongoose';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private jwtService: JwtService,
+  ) {}
 
   async login({ login, password }: LoginDto) {
-    const candidate = await this.usersService.findUserByQuery({ login });
+    const candidate = await this.usersRepository.findUserByQuery({ login });
     if (!candidate) {
       throw AuthExceptions.WrongAuthData();
     }
@@ -20,27 +25,53 @@ export class AuthService {
       throw AuthExceptions.WrongAuthData();
     }
     const { accessToken, refreshToken } =
-      await this.usersService.generateUserTokens(candidate.id, true);
+      await this.usersRepository.generateUserTokens(candidate.id, true);
     return this.createResponseDto(candidate, accessToken, refreshToken);
   }
 
   async register(authDto: RegisterDto) {
-    const candidate = await this.usersService.findUserByQuery({
+    const candidate = await this.usersRepository.findUserByQuery({
       login: authDto.login,
     });
     if (candidate) {
       throw AuthExceptions.UserAlreadyExist();
     }
-    const newUser = await this.usersService.createUser(authDto);
+    const newUser = await this.usersRepository.createUser(authDto);
     const { accessToken, refreshToken } =
-      await this.usersService.generateUserTokens(newUser.id, true);
+      await this.usersRepository.generateUserTokens(newUser.id, true);
     return this.createResponseDto(candidate, accessToken, refreshToken);
   }
 
+  async validateRefreshToken(token: string) {
+    if (!token) {
+      throw new ForbiddenException();
+    }
+    try {
+      await this.jwtService.verify(token, {
+        secret: process.env.JWT_REFRESH_SECRET,
+        maxAge: '1d',
+      });
+    } catch (e) {
+      throw new ForbiddenException();
+    }
+    const { id } = (await this.jwtService.decode(token, {
+      json: true,
+    })!) as Record<string, string>;
+    if (
+      !Types.ObjectId.isValid(id) ||
+      !(await this.usersRepository.findUserTokenById(id))
+    ) {
+      throw new ForbiddenException();
+    }
+    return this.usersRepository.findUserTokenByQuery({ refreshToken: token });
+  }
+
   async refresh(refreshToken: string) {
-    await this.usersService.validateRefreshToken(refreshToken);
-    const userTokens = await this.usersService.findUserToken({ refreshToken });
-    return this.usersService.generateUserTokens(userTokens.userId, true);
+    await this.validateRefreshToken(refreshToken);
+    const userTokens = await this.usersRepository.findUserTokenByQuery({
+      refreshToken,
+    });
+    return this.usersRepository.generateUserTokens(userTokens.userId, true);
   }
 
   private createResponseDto(user, accessToken, refreshToken) {

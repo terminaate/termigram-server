@@ -136,7 +136,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { refreshToken } = req.cookies;
-    await this.usersService.validateRefreshToken(refreshToken);
+    await this.authService.validateRefreshToken(refreshToken);
     res.clearCookie('refreshToken', {
       httpOnly: true,
       maxAge: this.refreshMaxAge,

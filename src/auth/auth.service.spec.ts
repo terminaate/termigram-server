@@ -14,7 +14,7 @@ describe('AuthService', () => {
   let memDb: MemoryDatabase;
 
   beforeAll(async () => {
-    memDb = new MemoryDatabase([
+    memDb = await MemoryDatabase.create([
       {
         name: User.name,
         schema: UserSchema,
