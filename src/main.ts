@@ -9,6 +9,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 const PORT = process.env.PORT || 5000;
 
 async function bootstrap() {
+  // TODO
+  // migrate to fastify
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: {
       credentials: true,
