@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { AuthExceptions } from './auth.exceptions';
 import * as argon2 from 'argon2';
-import { UserDto } from '../users/dtos/user.dto';
+import { UserDto } from '@/users/dtos/user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
-import { UsersRepository } from '../users/users.repository';
+import { UsersRepository } from '@/users/users.repository';
 import { Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { ApiException } from '../exceptions/api.exception';
+import { ApiException } from '@/exceptions/api.exception';
 
 @Injectable()
 export class AuthService {

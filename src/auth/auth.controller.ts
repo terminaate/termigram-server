@@ -8,11 +8,11 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '@/users/users.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserDto } from '../users/dtos/user.dto';
+import { UserDto } from '@/users/dtos/user.dto';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 @ApiTags('auth')

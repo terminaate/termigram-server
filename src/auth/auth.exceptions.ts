@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { ApiException } from '../exceptions/api.exception';
+import { ApiException } from '@/exceptions/api.exception';
 
 export class AuthExceptions extends ApiException {
   static UserAlreadyExist() {

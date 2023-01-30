@@ -9,6 +9,7 @@
 🟥 - Currently not possible to implement
 
 - Decide on project testing (🟨)
+- Add import path aliases (✅)
 - Add husky to project (🟨/✅)
 - Migrate to fastify (✅)
 - Basic authorization with access and refresh tokens (✅)

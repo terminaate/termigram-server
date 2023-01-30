@@ -1,4 +1,4 @@
-import { ApiException } from '../exceptions/api.exception';
+import { ApiException } from '@/exceptions/api.exception';
 
 export class UsersExceptions extends ApiException {
   static UserIdIsNotValid() {

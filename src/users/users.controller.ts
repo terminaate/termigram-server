@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard, UserRequest } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard, UserRequest } from '@/auth/guards/jwt-auth.guard';
 import { UserDto } from './dtos/user.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 
