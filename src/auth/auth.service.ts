@@ -1,12 +1,13 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthExceptions } from './auth.exceptions';
 import * as argon2 from 'argon2';
-import { UserDto } from '../users/dtos/user.dto';
+import { UserDto } from '@/users/dtos/user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
-import { UsersRepository } from '../users/users.repository';
+import { UsersRepository } from '@/users/users.repository';
 import { Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
+import { ApiException } from '@/exceptions/api.exception';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,7 @@ export class AuthService {
 
   async validateRefreshToken(token: string) {
     if (!token) {
-      throw new ForbiddenException();
+      throw ApiException.ForbiddenException();
     }
     try {
       await this.jwtService.verify(token, {
@@ -52,7 +53,7 @@ export class AuthService {
         maxAge: '1d',
       });
     } catch (e) {
-      throw new ForbiddenException();
+      throw ApiException.ForbiddenException();
     }
     const { id } = (await this.jwtService.decode(token, {
       json: true,
@@ -61,7 +62,7 @@ export class AuthService {
       !Types.ObjectId.isValid(id) ||
       !(await this.usersRepository.findUserTokenById(id))
     ) {
-      throw new ForbiddenException();
+      throw ApiException.ForbiddenException();
     }
     return this.usersRepository.findUserTokenByQuery({ refreshToken: token });
   }

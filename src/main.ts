@@ -1,30 +1,28 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { RequestMethod, ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
-import { json, urlencoded } from 'express';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import fastifyCookie from '@fastify/cookie';
 
 const PORT = process.env.PORT || 5000;
 
 async function bootstrap() {
-  // TODO
-  // migrate to fastify
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: {
-      credentials: true,
-      origin: process.env.CLIENT_URL,
-    },
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
 
   app.setGlobalPrefix('/api', {
     exclude: [{ path: '/static', method: RequestMethod.GET }],
   });
   app.useGlobalPipes(new ValidationPipe());
-  app.use(json({ limit: '10mb' }));
-  app.use(urlencoded({ extended: true, limit: '10mb' }));
-  app.use(cookieParser());
+  await app.register(fastifyCookie, {
+    secret: process.env.COOKIE_SECRET,
+  });
 
   // TODO
   // Find alternative to this package
